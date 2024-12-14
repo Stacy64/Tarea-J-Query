@@ -1,19 +1,12 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const userList = document.getElementById("user-list");
+$(document).ready(function() {
+    const userList = $("#user-list");
 
+    $.getJSON("https://reqres.in/api/users", function(data) {
+        const users = data.data;
 
-    fetch("https://reqres.in/api/users")
-        .then((response) => {
-            if (!response.ok) throw new Error("Error al obtener los usuarios");
-            return response.json();
-        })
-        .then((data) => {
-            const users = data.data;
-
-            users.forEach((user) => {
-                const userCard = document.createElement("div");
-                userCard.className = "col";
-                userCard.innerHTML = `
+        $.each(users, function(index, user) {
+            const userCard = `
+                <div class="col">
                     <div class="card h-100">
                         <img src="${user.avatar}" class="card-img-top" alt="Avatar de ${user.first_name}">
                         <div class="card-body">
@@ -24,12 +17,12 @@ document.addEventListener("DOMContentLoaded", () => {
                             <small class="text-muted">${user.id}</small>
                         </div>
                     </div>
-                `;
-                userList.appendChild(userCard);
-            });
-        })
-        .catch((error) => {
-            console.error("Error al cargar los usuarios:", error);
-            userList.innerHTML = `<p class="text-danger text-center">No se pudo cargar la lista de usuarios.</p>`;
+                </div>
+            `;
+            userList.append(userCard);
         });
+    }).fail(function() {
+        console.error("Error al cargar los usuarios.");
+        userList.html('<p class="text-danger text-center">No se pudo cargar la lista de usuarios.</p>');
+    });
 });
